@@ -1,0 +1,5 @@
+{
+  "markdown-pdf.headerTemplate": "<div style=\"font-size: 9px; width: 100%; text-align: left; padding-left: 10mm;\">Algotrade</div>",
+  "markdown-pdf.footerTemplate": "<div style=\"font-size: 9px; margin: 0 auto; width: 100%; text-align: center;\"><span class='pageNumber'></span> / <span class='totalPages'></span></div>",
+  "markdown-pdf.styles": [".vscode/markdown-pdf.css"]
+}

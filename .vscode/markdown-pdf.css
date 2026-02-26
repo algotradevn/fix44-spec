@@ -1,0 +1,56 @@
+/* Inline code styling (single backtick only) */
+code {
+  color: #2d5986 !important;
+  background-color: #eef3f8 !important;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+/* Code blocks (``` fenced) — reset to default theme colors */
+pre code {
+  color: inherit !important;
+  background-color: inherit !important;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+/* Links — remove underline, use subtle dark color */
+a {
+  color: #2d5986 !important;
+  text-decoration: none !important;
+}
+
+a:hover {
+  text-decoration: underline !important;
+}
+
+/* Headings */
+h1, h2, h3, h4 {
+  color: #1a3a5c !important;
+}
+
+/* Bold text — slightly darker */
+strong {
+  color: #1a1a1a;
+}
+
+/* Table header row */
+thead th {
+  background-color: #2d5986 !important;
+  color: #ffffff !important;
+}
+
+/* Table alternating rows */
+tbody tr:nth-child(even) {
+  background-color: #f5f8fb;
+}
+
+/* Blockquote styling */
+blockquote {
+  border-left: 3px solid #2d5986 !important;
+  color: #444 !important;
+  background-color: #f9fafb;
+  padding: 8px 16px;
+}
