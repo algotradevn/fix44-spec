@@ -205,9 +205,13 @@ Used to place a new order for equities or derivatives.
 | 54 | Side | Y | `1=Buy`, `2=Sell` |
 | 38 | OrderQty | Y | Quantity |
 | 40 | OrdType | Y | `1=Market`, `2=Limit`, `K=MTL` *(custom — see note below)* |
-| 44 | Price | C | **Required** when `40=2` (Limit); omitted otherwise |
+| 44 | Price | C | **Required** when `40=2` (Limit); omitted otherwise. See price convention below. |
 | 59 | TimeInForce | Y | See below |
 | 60 | TransactTime | Y | Order creation time |
+
+> **Price convention:**
+> - **Equities:** Price (tag `44`) is the per-share price in **VND** (e.g., MWG at 72,000 VND → `44=72000`).
+> - **Derivatives:** Price (tag `44`) is the **index point value** (e.g., VN30F2603 at 2,026.3 points → `44=2026.3`).
 
 #### 3.1.2 Custom OrdType note
 
@@ -314,6 +318,12 @@ The FIX server sends Execution Reports to confirm order state changes, trades, c
 When `150=F` (Trade) is sent:
 - `31` (LastPx) **required**
 - `32` (LastQty) **required**
+
+> **Price convention on fills:**
+> - `LastPx` (`31`) and `AvgPx` (`6`) represent the **actual execution price before fees/commissions**.
+>   - **Equities:** price in **VND** per share (e.g., MWG filled → `31=72000`).
+>   - **Derivatives:** price in **index points** (e.g., VN30F2603 filled → `31=2026.3`).
+> - Fee/commission information may optionally be provided via the Commission group (`136` NoMiscFees / `137` MiscFeeAmt / `139` MiscFeeType) if supported by \<Broker\> (see Open Item #7).
 
 ### 4.3 Reject fields (required when `150=8`)
 
