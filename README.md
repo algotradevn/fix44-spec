@@ -6,4 +6,4 @@ We support our partners by providing robust, end-to-end FIX integration services
 
 This document serves as ALGOTRADE's definitive, recommended FIX 4.4 specification, designed to equip our partners in Vietnam with a seamless, institution-grade connectivity framework.
 
-View the specification in PDF **[here](Algotrade_FIX44_Spec_Template.pdf)**.
+View the specification in PDF **[here](Algotrade_FIX44_Spec.pdf)**.

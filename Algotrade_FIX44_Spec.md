@@ -3,6 +3,7 @@
 </div>
 
 <h1 style="text-align: center; border: none;">FIX 4.4 Trading API Specification</h1>
+<p style="text-align: center; color: #666; font-size: 0.95em;">v2026.02.27</p>
 
 <div style="page-break-before: always;"></div>
 
@@ -22,11 +23,10 @@
 - [3) Trading Messages (Application)](#3-trading-messages-application)
   - [3.1 New Order Single (35=D)](#31-new-order-single-35d)
     - [3.1.1 Required fields](#311-required-fields)
-    - [3.1.2 Custom OrdType note](#312-custom-ordtype-note)
-    - [3.1.3 TimeInForce (59) values](#313-timeinforce-59-values)
-    - [3.1.4 Additional fields for derivatives](#314-additional-fields-for-derivatives)
-    - [3.1.5 Example — Equity](#315-example--equity-limit-order-day)
-    - [3.1.6 Example — Derivatives](#316-example--derivatives-futures-limit-order)
+    - [3.1.2 TimeInForce (59) values](#312-timeinforce-59-values)
+    - [3.1.3 Additional fields for derivatives](#313-additional-fields-for-derivatives)
+    - [3.1.4 Example — Equity](#314-example--equity-limit-order-day)
+    - [3.1.5 Example — Derivatives](#315-example--derivatives-futures-limit-order)
   - [3.2 Order Cancel Request (35=F)](#32-order-cancel-request-35f)
 - [4) Execution Report (35=8) — Fields, States & Mapping](#4-execution-report-358--fields-states--mapping)
   - [4.1 Fields expected on all Execution Reports](#41-fields-expected-on-all-execution-reports)
@@ -58,7 +58,7 @@ Algotrade provides this specification to support \<Broker\>'s FIX 4.4 implementa
 
 Algotrade will serve as a **FIX client to connect and jointly test** the implementation with \<Broker\>.
 
-The specification covers **equities and derivatives** uniformly. Both product types use the same message types and session model; the only difference is a small number of additional tags for contract identification on derivatives orders (see section 3.1.4).
+The specification covers **equities and derivatives** uniformly. Both product types use the same message types and session model; the only difference is a small number of additional tags for contract identification on derivatives orders (see section 3.1.3).
 
 **Covered in this document:**
 - Session: **Logon (A)**, **Logout (5)**, and standard FIX session-level messages
@@ -155,6 +155,8 @@ The **Account** tag (`1`) on every order identifies the specific sub-account. Th
 98=0|108=30|141=Y|10=000|
 ```
 
+<div style="page-break-before: always;"></div>
+
 ### 2.3 Logout (35=5)
 
 Either party may initiate logout.
@@ -204,7 +206,7 @@ Used to place a new order for equities or derivatives.
 | 55 | Symbol | Y | Ticker only (e.g., `MWG`) unless later agreed otherwise |
 | 54 | Side | Y | `1=Buy`, `2=Sell` |
 | 38 | OrderQty | Y | Quantity |
-| 40 | OrdType | Y | `1=Market`, `2=Limit`, `K=MTL` *(custom — see note below)* |
+| 40 | OrdType | Y | `1=Market`, `2=Limit`, `K=Market With Leftover as Limit (MTL)` |
 | 44 | Price | C | **Required** when `40=2` (Limit); omitted otherwise. See price convention below. |
 | 59 | TimeInForce | Y | See below |
 | 60 | TransactTime | Y | Order creation time |
@@ -213,11 +215,9 @@ Used to place a new order for equities or derivatives.
 > - **Equities:** Price (tag `44`) is the per-share price in **VND** (e.g., MWG at 72,000 VND → `44=72000`).
 > - **Derivatives:** Price (tag `44`) is the **index point value** (e.g., VN30F2603 at 2,026.3 points → `44=2026.3`).
 
-#### 3.1.2 Custom OrdType note
+<div style="page-break-before: always;"></div>
 
-`OrdType K = MTL (Market-to-Limit)` is a custom extension specific to Vietnamese exchanges. It is not part of the standard FIX 4.4 OrdType enumeration. Both sides agree to support this value.
-
-#### 3.1.3 TimeInForce (59) values
+#### 3.1.2 TimeInForce (59) values
 
 The following values cover all standard Vietnamese order types (LO, ATO, ATC, MAK, MOK). All values are standard FIX 4.4. Availability may vary between equities and derivatives sessions on the exchange.
 
@@ -229,7 +229,7 @@ The following values cover all standard Vietnamese order types (LO, ATO, ATC, MA
 | `4` | FOK (Fill or Kill) | MOK | |
 | `7` | AtTheClose | ATC | |
 
-#### 3.1.4 Additional fields for derivatives
+#### 3.1.3 Additional fields for derivatives
 
 For derivatives orders (futures, options), the following fields should be included in addition to those in 3.1.1:
 
@@ -242,21 +242,19 @@ For derivatives orders (futures, options), the following fields should be includ
 
 > **Question for \<Broker\>:** Please confirm the preferred contract identification scheme for derivatives — Symbol-based (`55`, e.g., `VN30F2603`) or SecurityID-based (`48` + `22`).
 
-#### 3.1.5 Example — Equity (Limit Order, Day)
+#### 3.1.4 Example — Equity (Limit Order, Day)
 
 ```
 8=FIX.4.4|35=D|49=ALGOTRADE|56=BROKER|34=21|52=20260101-01:00:00.000|
 1=ACC001|11=CL000001|207=HSX|55=MWG|54=1|38=100|40=2|44=50000|59=0|60=20260101-01:00:00.000|10=000|
 ```
 
-#### 3.1.6 Example — Derivatives (Futures, Limit Order)
+#### 3.1.5 Example — Derivatives (Futures, Limit Order)
 
 ```
 8=FIX.4.4|35=D|49=ALGOTRADE|56=BROKER|34=100|52=20260315-02:00:00.000|
 1=ACC002|11=CL000050|167=FUT|207=HNX|55=VN30F2606|54=1|38=10|40=2|44=1350|59=0|60=20260315-02:00:00.000|10=000|
 ```
-
----
 
 ### 3.2 Order Cancel Request (35=F)
 
@@ -274,13 +272,14 @@ Requests cancellation of the remaining quantity of a working order.
 | 207 | SecurityExchange | Y | Exchange code |
 | 55 | Symbol | Y | Ticker/contract symbol |
 | 54 | Side | Y | Same as original order |
+| 38 | OrderQty | Y | Same as original order |
 | 60 | TransactTime | Y | Cancel request time |
 
 #### Example
 
 ```
 8=FIX.4.4|35=F|49=ALGOTRADE|56=BROKER|34=40|52=20260101-01:05:00.000|
-11=CXL000001|1=ACC001|37=123456|41=CL000001|207=HSX|55=MWG|54=1|60=20260101-01:05:00.000|10=000|
+11=CXL000001|1=ACC001|37=ORD0001|41=CL000001|207=HSX|55=MWG|54=1|38=200|60=20260101-01:05:00.000|10=000|
 ```
 
 <div style="page-break-before: always;"></div>
@@ -311,7 +310,11 @@ The FIX server sends Execution Reports to confirm order state changes, trades, c
 | 151 | LeavesQty | Y | Remaining open quantity |
 | 14 | CumQty | Y | Cumulative filled quantity |
 | 6 | AvgPx | Y | Average fill price (`0` if no fills yet) |
-| 60 | TransactTime | Y | Execution or event timestamp |
+| 60 | TransactTime | Y | Event timestamp — see note below |
+
+> **TransactTime (60):** For exchange-originated events (`150=0` New, `150=F` Fill, `150=4` Cancelled, `150=C` Expired), this field should carry the **exchange timestamp**, not the broker's processing time. This allows the client to measure the true **exchange → client** latency — the only end-to-end metric that matters for execution quality analysis. For broker-originated events (`150=A` Pending New, broker-level `150=8` Rejected), the broker's own timestamp is expected since no exchange interaction has occurred.
+
+<div style="page-break-before: always;"></div>
 
 ### 4.2 Trade-specific fields (required when a fill occurs)
 
@@ -323,7 +326,7 @@ When `150=F` (Trade) is sent:
 > - `LastPx` (`31`) and `AvgPx` (`6`) represent the **actual execution price before fees/commissions**.
 >   - **Equities:** price in **VND** per share (e.g., MWG filled → `31=72000`).
 >   - **Derivatives:** price in **index points** (e.g., VN30F2603 filled → `31=2026.3`).
-> - Fee/commission information may optionally be provided via the Commission group (`136` NoMiscFees / `137` MiscFeeAmt / `139` MiscFeeType) if supported by \<Broker\> (see Open Item #7).
+> - Fee/commission information may optionally be provided via the Miscellaneous Fees group (`136` NoMiscFees / `137` MiscFeeAmt / `139` MiscFeeType) if supported by \<Broker\> (see Open Item #7).
 
 ### 4.3 Reject fields (required when `150=8`)
 
@@ -346,6 +349,8 @@ When an order is rejected:
 | `99` | Other |
 
 > \<Broker\> may define additional values beyond the standard set above. We would appreciate if any custom rejection reasons are documented and shared so that Algotrade can handle them correctly.
+
+<div style="page-break-before: always;"></div>
 
 ### 4.4 ExecType (150) ↔ OrdStatus (39) Mapping
 
@@ -404,7 +409,7 @@ When \<Broker\> cannot honor a cancel request (e.g., order already filled, unkno
 
 ```
 8=FIX.4.4|35=9|49=BROKER|56=ALGOTRADE|34=45|52=20260101-01:06:00.000|
-11=CXL000001|37=123456|41=CL000001|1=ACC001|39=2|434=1|102=0|58=Too late to cancel, order already filled|60=20260101-01:06:00.000|10=000|
+11=CXL000001|37=ORD0001|41=CL000001|1=ACC001|39=2|434=1|102=0|58=Too late to cancel, order already filled|60=20260101-01:06:00.000|10=000|
 ```
 
 <div style="page-break-before: always;"></div>
@@ -521,6 +526,8 @@ Full message examples for each scenario. All examples use: Buy MWG on HSX, Accou
 32=100|31=50500|151=0|14=200|6=50250|60=20260101-01:02:00.000|10=000|
 ```
 
+<div style="page-break-before: always;"></div>
+
 ### 7.4 Cancel — Success
 
 Assumes order `CL000001` is in New state (`39=0`) with `OrderID=ORD0001`.
@@ -528,7 +535,7 @@ Assumes order `CL000001` is in New state (`39=0`) with `OrderID=ORD0001`.
 **Step 1.** Algotrade → \<Broker\>: Order Cancel Request
 ```
 8=FIX.4.4|35=F|49=ALGOTRADE|56=BROKER|34=5|52=20260101-01:05:00.000|
-11=CXL000001|1=ACC001|37=ORD0001|41=CL000001|207=HSX|55=MWG|54=1|60=20260101-01:05:00.000|10=000|
+11=CXL000001|1=ACC001|37=ORD0001|41=CL000001|207=HSX|55=MWG|54=1|38=200|60=20260101-01:05:00.000|10=000|
 ```
 
 **Step 2.** \<Broker\> → Algotrade: Pending Cancel (`150=6, 39=6`)
@@ -552,7 +559,7 @@ Assumes order `CL000001` is in New state (`39=0`) with `OrderID=ORD0001`.
 **Step 1.** Algotrade → \<Broker\>: Order Cancel Request
 ```
 8=FIX.4.4|35=F|49=ALGOTRADE|56=BROKER|34=8|52=20260101-01:06:00.000|
-11=CXL000002|1=ACC001|37=ORD0001|41=CL000001|207=HSX|55=MWG|54=1|60=20260101-01:06:00.000|10=000|
+11=CXL000002|1=ACC001|37=ORD0001|41=CL000001|207=HSX|55=MWG|54=1|38=200|60=20260101-01:06:00.000|10=000|
 ```
 
 **Step 2.** \<Broker\> → Algotrade: Order Cancel Reject (`35=9`)
@@ -593,8 +600,8 @@ Assumes order `CL000001` is in New state (`39=0`) with `OrderID=ORD0001`.
 
 **Step 5.** Algotrade → \<Broker\>: Order Cancel Request
 ```
-8=FIX.4.4|35=F|49=ALGOTRADE|56=BROKER|34=5|52=20260101-01:02:00.000|
-11=CXL000001|1=ACC001|37=ORD0001|41=CL000001|207=HSX|55=MWG|54=1|60=20260101-01:02:00.000|10=000|
+8=FIX.4.4|35=F|49=ALGOTRADE|56=BROKER|34=3|52=20260101-01:02:00.000|
+11=CXL000001|1=ACC001|37=ORD0001|41=CL000001|207=HSX|55=MWG|54=1|38=200|60=20260101-01:02:00.000|10=000|
 ```
 
 **Step 6.** \<Broker\> → Algotrade: Cancelled (`150=4, 39=4`) — 100 filled, 100 cancelled
@@ -634,16 +641,25 @@ Assumes order `CL000001` is in New state (`39=0`) with `OrderID=ORD0001`.
 1=ACC001|11=CL000004|207=HSX|55=MWG|54=1|38=200|40=1|59=3|60=20260101-01:00:00.000|10=000|
 ```
 
-**Step 2.** \<Broker\> → Algotrade: Partial Fill (`150=F, 39=1`) — filled 80 @ 50,000
+**Step 2.** \<Broker\> → Algotrade: Pending New (`150=A, 39=A`)
 ```
-8=FIX.4.4|35=8|49=BROKER|56=ALGOTRADE|34=2|52=20260101-01:00:00.100|
+8=FIX.4.4|35=8|49=BROKER|56=ALGOTRADE|34=2|52=20260101-01:00:00.050|
+150=A|39=A|17=EXEC029|37=ORD0004|11=CL000004|1=ACC001|55=MWG|207=HSX|54=1|38=200|40=1|59=3|
+151=200|14=0|6=0|60=20260101-01:00:00.050|10=000|
+```
+
+<div style="page-break-before: always;"></div>
+
+**Step 3.** \<Broker\> → Algotrade: Partial Fill (`150=F, 39=1`) — filled 80 @ 50,000
+```
+8=FIX.4.4|35=8|49=BROKER|56=ALGOTRADE|34=3|52=20260101-01:00:00.100|
 150=F|39=1|17=EXEC030|37=ORD0004|11=CL000004|1=ACC001|55=MWG|207=HSX|54=1|38=200|40=1|59=3|
 32=80|31=50000|151=120|14=80|6=50000|60=20260101-01:00:00.100|10=000|
 ```
 
-**Step 3.** \<Broker\> → Algotrade: Expired (`150=C, 39=C`) — remaining 120 expired
+**Step 4.** \<Broker\> → Algotrade: Expired (`150=C, 39=C`) — remaining 120 expired
 ```
-8=FIX.4.4|35=8|49=BROKER|56=ALGOTRADE|34=3|52=20260101-01:00:00.200|
+8=FIX.4.4|35=8|49=BROKER|56=ALGOTRADE|34=4|52=20260101-01:00:00.200|
 150=C|39=C|17=EXEC031|37=ORD0004|11=CL000004|1=ACC001|55=MWG|207=HSX|54=1|38=200|40=1|59=3|
 151=0|14=80|6=50000|60=20260101-01:00:00.200|10=000|
 ```
@@ -678,8 +694,6 @@ We would be happy to discuss any of the following items. Confirming these early 
 | 8 | Maximum message rate / throttling limits | Pending |
 | 9 | Behavior of working orders during disconnect — remain active? | Pending |
 | 10 | End-of-day handling — Expired (`39=C`) or Cancelled (`39=4`) for unfilled Day orders? | Pending |
-
----
 
 ## 9) Public References
 
@@ -720,7 +734,7 @@ All application-level tags used in this specification:
 | 31 | LastPx | 8 (fills) |
 | 32 | LastQty | 8 (fills) |
 | 37 | OrderID | F, 8, 9 |
-| 38 | OrderQty | D, 8 |
+| 38 | OrderQty | D, F, 8 |
 | 39 | OrdStatus | 8, 9 |
 | 40 | OrdType | D, 8 |
 | 41 | OrigClOrdID | F, 8, 9 |
