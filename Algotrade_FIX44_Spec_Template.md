@@ -1,5 +1,5 @@
 <div style="text-align: center; margin-top: 40px;">
-  <img src="Algotrade - Logo-04.png" alt="Algotrade" style="width: 60%;">
+  <img src="logo.png" alt="Algotrade" style="width: 60%;">
 </div>
 
 <h1 style="text-align: center; border: none;">FIX 4.4 Trading API Specification</h1>
